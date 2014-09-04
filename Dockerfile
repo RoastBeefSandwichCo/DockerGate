@@ -16,7 +16,7 @@ RUN add-apt-repository -y ppa:chris-lea/node.js && apt-get update && apt-get -y 
 #Download Gatewayd, use known compatible release
 RUN git clone https://github.com/ripple/gatewayd.git
 RUN cd gatewayd/
-#FIXME: RUN git checkout cd92ad3 FIXME
+RUN git checkout cd92ad3
 #INSTALL gatewayd dependencies, pm2 separately, save
 RUN npm install --global pg grunt grunt-cli forever db-migrate jshint && npm install --global pm2 --unsafe-perm && npm install --save
 
@@ -26,54 +26,29 @@ RUN randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
 RUN postgresPW=`randpw 20`
 RUN gatewayd_userPW=`randpw 20`
 RUN rest_userPW=`randpw 20`
-
- service postgresql start
-RUN su - postgres -c "psql -c \"alter user postgres with password '$postgresPW';\""
-# Create postgres user
-RUN su - postgres -c "psql -c \"create user gatewayd_user with password '$gatewayd_userPW';\""
-# Create ripple rest user
-RUN su - postgres -c "psql -c \"create user ripplerest_user with password '$rest_userPW';\""
-#>>>>>>>>>>>>>>>>>>>EVERYTHING ABOVE THIS LINE IS IN THE IMAGE >>>>>>>>>>>>>>>>>
-
-# Create database
+# Create & configure database
 #change postgres template: http://stackoverflow.com/questions/16736891/pgerror-error-new-encoding-utf8-is-incompatible
+RUN service postgresql start
 RUN su - postgres -c "psql -c \"UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';\""
 RUN su - postgres -c "psql -c \"DROP DATABASE template1;\""
 RUN su - postgres -c "psql -c \"CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';\""
 RUN su - postgres -c "psql -c \"UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';\""
 RUN su - postgres -c "psql -c \"\\c template1\""
 RUN su - postgres -c "psql -c \"VACUUM FREEZE;\""
-RUN su - postgres -c "psql -c \"create database gatewayd_db with owner gatewayd_user encoding='utf8';\""
+RUN su - postgres -c "psql -c \"alter user postgres with password '$postgresPW';\""
+RUN su - postgres -c "psql -c \"create user gatewayd_user with password '$gatewayd_userPW';\""
+RUN su - postgres -c "psql -c \"create user ripplerest_user with password '$rest_userPW';\""
+RUN su - postgres -c "psql -c \"CREATE DATABASE gatewayd_db with OWNER gatewayd_user encoding='utf8';\""
+RUN su - postgres -c "psql -c \"GRANT ALL ON DATABASE gatewayd_db TO ripplerest_user;\""
+RUN su - postgres -c "psql -c \"GRANT ALL ON DATABASE gatewayd_db TO gatewayd_user;\""
+
+#Edit config files with paths, passwords
+RUN sed -i "s/postgres:password\/gatewayd_user:$gatewayd_userPW/g" ./config/config.js
+RUN cp lib/data/database.example.json lib/data/database.json
+RUN sed -i "s/DATABASE_URL/postgres:\/\/gatewayd_user:$gatewayd_userPW@localhost:5432\/gatewayd_db/g" ./lib/data/database.json
 #>>>>>>>>>>>>>>>>>>>EVERYTHING ABOVE THIS LINE IS IN THE IMAGE >>>>>>>>>>>>>>>>>
 
-RUN sed -i "s/password/$gatewayd_userPW/g" ./config/config.js
-RUN cp lib/data/database.example.json lib/data/database.json
-RUN sed -i "s/DATABASE_URL/postgres:\/\/postgres:$gatewayd_userPW@localhost:5432\/gatewayd_db/g" ./lib/data/database.json
-
-
-#>UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';
-#>DROP DATABASE template1;
-#>CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';
-#>UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';
-#>\c template1
-#>VACUUM FREEZE;
-# su - postgres -c "psql -c \"create database gatewayd_db with owner gatewayd_user encoding='utf8';\""
-#grant users access
-#grant all on such and such
-#usd sed to update gatewayd configs
-#
-#gateway config/config.js
-#'DATABASE_URL': 'postgres://gatewayd_user:password@localhost:5432/gatewayd_db',
-#
-#lib/data/database
-#
-#'development': {
-#  'ENV': 'postgres://gatewayd_user:password@localhost:5432/gatewayd_db'
-#}
-#TODO: update to production when appropriate
-#
-#dont forget the bug here
-#grunt migrate
+RUN grunt migrate
 #
 #start gatewayd, add wallets, currencies (point to our daemon
 #
