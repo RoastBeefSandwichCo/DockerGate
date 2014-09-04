@@ -32,4 +32,12 @@ RUN su - postgres -c "psql -c \"alter user postgres with password '$postgresPW';
 # Create postgres user
 RUN su - postgres -c "psql -c \"create user gatewayd_user with password '$gatewayd_userPW';\""
 # Create database and grant user access
+#change postgres template: http://stackoverflow.com/questions/16736891/pgerror-error-new-encoding-utf8-is-incompatible
+script these commands
+>UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';
+>DROP DATABASE template1;
+>CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';
+>UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';
+>\c template1
+>VACUUM FREEZE;
 RUN su - postgres -c "psql -c \"create database gatewayd_db with owner gatewayd_user encoding='utf8';\""
