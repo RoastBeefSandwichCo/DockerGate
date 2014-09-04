@@ -1,4 +1,4 @@
-RUN#TODO: addusers gatewayd and ripple-rest, run with appropriate permissions
+#TODO: addusers gatewayd and ripple-rest, run with appropriate permissions
 
 # Set the base image to Ubuntu
 FROM ubuntu:14.04
@@ -16,7 +16,7 @@ RUN add-apt-repository -y ppa:chris-lea/node.js && apt-get update && apt-get -y 
 #Download Gatewayd, use known compatible release
 RUN git clone https://github.com/ripple/gatewayd.git
 RUN cd gatewayd/
-RUN git checkout v3.4.0
+RUN git checkout cd92ad3
 #INSTALL gatewayd dependencies, pm2 separately, save
 RUN npm install --global pg grunt grunt-cli forever db-migrate jshint && npm install --global pm2 --unsafe-perm && npm install --save
 
