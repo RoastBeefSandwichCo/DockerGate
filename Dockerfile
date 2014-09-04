@@ -10,7 +10,7 @@ MAINTAINER Jacob McShane
 RUN apt-get update
 RUN apt-get install -y git python-software-properties python g++ make libpq-dev software-properties-common postgresql postgresql-client
 # Add Node.js Repository, update, install
-RUN add-apt-repository -y ppa:chris-lea/node.js && apt-get update && apt-get -y install nodejs
+ add-apt-repository -y ppa:chris-lea/node.js && apt-get update && apt-get -y install nodejs
 
 
 #Download Gatewayd, use known compatible release
@@ -21,12 +21,15 @@ RUN git checkout v3.4.0
 RUN npm install --global pg grunt grunt-cli forever db-migrate jshint && npm install --global pm2 --unsafe-perm && npm install --save
 
 #CONFIGURE postgres
-# Define password generator, generate password
+# Define password generator, generate passwords
 RUN randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
-RUN PASSWORD=`randpw 20`
+RUN postgresPW=`randpw 20`
+RUN gatewayd_userPW=`randpw 20`
+RUN rest_userPW=`randpw 20`
+
 RUN service postgresql start
-#FIXME: NEEDS POSTGRES PASSWORD SET
+RUN su - postgres -c "psql -c \"alter user postgres with password '$postgresPW';\""
 # Create postgres user
-RUN psql -U postgres -c "create user gatewayd_user with password '$PASSWORD'" -h localhost
+RUN su - postgres -c "psql -c \"create user gatewayd_user with password '$gatewayd_userPW';\""
 # Create database and grant user access
-RUN psql -U postgres -c "create database gatewayd_db with owner gatewayd_user encoding='utf8'" -h localhost
+RUN su - postgres -c "psql -c \"create database gatewayd_db with owner gatewayd_user encoding='utf8';\""
