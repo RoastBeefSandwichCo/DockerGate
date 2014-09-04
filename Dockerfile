@@ -50,7 +50,8 @@ RUN sed -i "s/DATABASE_URL/postgres:\/\/gatewayd_user:$gatewayd_userPW@localhost
 
 RUN grunt migrate
 #>>>>>>>>>>>>>>>>>>>EVERYTHING ABOVE THIS LINE IS IN THE IMAGE >>>>>>>>>>>>>>>>>
-#
+#pushed to ninobrooks/dockergate, tagged dev
+
 #start gatewayd, add wallets, currencies (point to our daemon
 #
 #Documentation for that has moved, perhaps the process has changed. We'll cross that bridge when we get to it.
