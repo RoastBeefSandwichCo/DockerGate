@@ -43,12 +43,13 @@ RUN su - postgres -c "psql -c \"GRANT ALL ON DATABASE gatewayd_db TO ripplerest_
 RUN su - postgres -c "psql -c \"GRANT ALL ON DATABASE gatewayd_db TO gatewayd_user;\""
 
 #Edit config files with paths, passwords
-RUN sed -i "s/postgres:password\/gatewayd_user:$gatewayd_userPW/g" ./config/config.js
+RUN sed -i "s/postgres:password/gatewayd_user:$gatewayd_userPW/g" ./config/config.js
+RUN sed -i "s/\/ripple_gateway/\/gatewayd_db/g" ./config/config.js
 RUN cp lib/data/database.example.json lib/data/database.json
 RUN sed -i "s/DATABASE_URL/postgres:\/\/gatewayd_user:$gatewayd_userPW@localhost:5432\/gatewayd_db/g" ./lib/data/database.json
-#>>>>>>>>>>>>>>>>>>>EVERYTHING ABOVE THIS LINE IS IN THE IMAGE >>>>>>>>>>>>>>>>>
 
 RUN grunt migrate
+#>>>>>>>>>>>>>>>>>>>EVERYTHING ABOVE THIS LINE IS IN THE IMAGE >>>>>>>>>>>>>>>>>
 #
 #start gatewayd, add wallets, currencies (point to our daemon
 #
