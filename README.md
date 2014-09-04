@@ -12,11 +12,13 @@ Ours is built on ubuntu:14.04. Dockerfile generates passwords and updates config
 
 ##Progress
 
+(Steven's list, re-ordered)
+
 Install all gatewayd dependencies *DONE*
 
-Include automatic startup scripts for gatewayd and ripple rest *in progress* 
-
 Configure the gatewayd postgresql database *DONE*
+
+Include automatic startup scripts for gatewayd and ripple rest *in progress* 
 
 Start gatewayd with admin webapp and export gateway webapp and http api port *queued*
 
