@@ -1,0 +1,126 @@
+#Dockerfile was breaking on some commands that worked fine in shell.
+#Building image instead, adding re-conf scripts. Or something. Donno. Sleepy.
+
+#TODO: addusers gatewayd and ripple-rest, run with appropriate permissions
+
+#TODO: auto-reconfig script (not related to this file)
+
+
+# Set the base image to Ubuntu
+FROM ubuntu:14.04
+# File Author / Maintainer
+MAINTAINER Jacob McShane
+
+#USERS
+# Define password generator, generate passwords
+randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
+postgresPW=`randpw 20`
+gatewayd_userPW=`randpw 20`
+gatewayd_shellPW=`randpw 20`
+ripple_rest_userPW=`randpw 20`
+
+useradd -U -m -r -s /dev/null restful
+useradd -U -m -r gatewayd
+adduser gatewayd sudo
+echo "gatewayd:$gatewayd_shellPW" | chpasswd
+
+#DEPENDENCIES
+# Update the repository sources list
+ apt-get update
+ apt-get install -y git python-software-properties python g++ make libpq-dev software-properties-common postgresql postgresql-client
+# Add Node.js Repository, update, install
+ add-apt-repository -y ppa:chris-lea/node.js && apt-get update && apt-get -y install nodejs
+
+
+#Download Gatewayd, use known compatible release
+ git clone https://github.com/ripple/gatewayd.git
+ cd gatewayd/
+ git checkout cd92ad3
+#INSTALL gatewayd dependencies, pm2 separately, save
+ npm install --global pg grunt grunt-cli forever db-migrate jshint && npm install --global pm2 --unsafe-perm && npm install --save
+
+#CONFIGURE postgres
+# Create & configure database
+#change postgres template: http://stackoverflow.com/questions/16736891/pgerror-error-new-encoding-utf8-is-incompatible
+ service postgresql start
+
+ su - postgres -c "psql -c \"UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';\""
+ su - postgres -c "psql -c \"DROP DATABASE template1;\""
+ su - postgres -c "psql -c \"CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';\""
+ su - postgres -c "psql -c \"UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';\""
+ su - postgres -c "psql -c \"\\c template1\""
+ su - postgres -c "psql -c \"VACUUM FREEZE;\""
+ su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD '$postgresPW';\""
+ su - postgres -c "psql -c \"CREATE USER gatewayd_user WITH PASSWORD '$gatewayd_userPW';\""
+ #ripple_rest_user should be created with -E -S -R -D flags but they're breaking so...
+ su - postgres -c "psql -c \"CREATE USER ripple_rest_user WITH PASSWORD '$ripple_rest_userPW';\""
+
+ su - postgres -c "psql -c \"CREATE DATABASE gatewayd_db WITH OWNER gatewayd_user encoding='utf8';\""
+ su - postgres -c "psql -c \"CREATE DATABASE ripple_rest_db WITH OWNER ripple_rest_user encoding='utf8';\""
+ su - postgres -c "psql -c \"GRANT ALL ON DATABASE gatewayd_db TO gatewayd_user;\""
+ su - postgres -c "psql -c \"GRANT ALL ON DATABASE ripple_rest_db TO ripple_rest_user;\""
+
+#Set users, passwords, DBs in configs
+ sed -i "s/postgres:password/gatewayd_user:$gatewayd_userPW/g" ./config/config.js
+ sed -i "s/\/ripple_gateway/\/gatewayd_db/g" ./config/config.js
+ cp lib/data/database.example.json lib/data/database.json
+ sed -i "s/DATABASE_URL/postgres:\/\/gatewayd_user:$gatewayd_userPW@localhost:5432\/gatewayd_db/g" ./lib/data/database.json
+
+ grunt migrate
+#>>>>>>>>>>>>>>>>>>>EVERYTHING ABOVE THIS LINE IS IN THE IMAGE >>>>>>>>>>>>>>>>>e61c321625940579f44e2f57529dda06fe10065b8f479ded2b5c4b7da1c1fd8a
+
+#install rest
+#notes:
+  #should be owned by user 'restful', see top of file.
+  #should be RUN as user 'restful'
+  #permissions will need to be adjusted to allow execution, r/w, etc.
+  #In short, this may not work properly at all except as root or until it has its own user.
+
+cd /opt && git clone https://github.com/ripple/ripple-rest.git && cd ripple-rest
+#tested with 1.0.1
+git checkout bf23f74
+
+cp config-example.json config.json
+#store pw in config
+sed -i "s/ripple_rest_user:password/ripple_rest_user:$ripple_rest_userPW/g" ./config.json
+export DATABASE_URL=postgres://ripple_rest_user:$ripple_rest_userPW@localhost:5432/ripple_rest_db
+#install dependencies, run migrations
+npm install -g pg && npm install
+
+
+openssl genrsa -out /etc/ssl/private/server.key 2048
+
+#make this non-interactive
+openssl req -utf8 -new -key /etc/ssl/private/server.key -out /etc/ssl/server.csr -sha512
+  -batch
+
+openssl x509 -req -days 730 -in /etc/ssl/server.csr -signkey /etc/ssl/private/server.key
+  -out /etc/ssl/certs/server.crt -sha512
+
+
+#create startup script
+#BROKEN. for now. "can't execute /dev/null". figure that out, then tune it up.
+echo "#!/bin/sh" > /usr/bin/start-rest.sh
+echo "cd /opt/ripple-rest" >> /usr/bin/start-rest.sh
+echo "export DATABASE_URL=postgres://ripple_rest_user:$ripple_ripple_rest_userPW@localhost:5432/ripple_rest_db" >> /usr/bin/start-rest.sh
+echo "sudo -E -u restful /usr/bin/node server.js" >> /usr/bin/start-rest.sh
+su - restful -c /usr/bin/node server.js
+#chown restful:restful /usr/bin/start-rest.sh &&
+chmod +x /usr/bin/start-rest.sh
+
+
+
+###implement later
+##openssl genrsa -out /etc/ssl/private/server.key 2048
+##openssl req -utf8 -new -key /etc/ssl/private/server.key -out /etc/ssl/server.csr -sha512
+##  -batch
+##openssl x509 -req -days 730 -in /etc/ssl/server.csr -signkey /etc/ssl/private/server.key
+##  -out /etc/ssl/certs/server.crt -sha512
+#
+#start gatewayd, add wallets, currencies (point to our daemon
+#
+#Documentation for that has moved, perhaps the process has changed. We'll cross that bridge when we get to it.
+
+
+#ISSUES:
+#sed replaces ALL instances of database_url in database.json
