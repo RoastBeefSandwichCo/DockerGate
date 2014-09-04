@@ -46,6 +46,9 @@ RUN su - postgres -c "psql -c \"VACUUM FREEZE;\""
 RUN su - postgres -c "psql -c \"create database gatewayd_db with owner gatewayd_user encoding='utf8';\""
 #>>>>>>>>>>>>>>>>>>>EVERYTHING ABOVE THIS LINE IS IN THE IMAGE >>>>>>>>>>>>>>>>>
 
+RUN sed -i "s/password/$gatewayd_userPW/g" ./config/config.js
+RUN cp lib/data/database.example.json lib/data/database.json
+RUN sed -i "s/DATABASE_URL/postgres:\/\/postgres:$gatewayd_userPW@localhost:5432\/gatewayd_db/g" ./lib/data/database.json
 
 
 #>UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';
@@ -75,3 +78,7 @@ RUN su - postgres -c "psql -c \"create database gatewayd_db with owner gatewayd_
 #start gatewayd, add wallets, currencies (point to our daemon
 #
 #Documentation for that has moved, perhaps the process has changed. We'll cross that bridge when we get to it.
+
+
+#ISSUES:
+#sed replaces ALL instances of database_url in database.json
