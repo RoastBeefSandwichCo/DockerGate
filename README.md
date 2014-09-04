@@ -14,7 +14,7 @@ Ours is built on ubuntu:14.04. Dockerfile generates passwords and updates config
 
 (Steven's list, re-ordered)
 
-Install all gatewayd dependencies *DONE*
+Install all gatewayd dependencies ~~*DONE*~~ forgot ripple-rest!
 
 Configure the gatewayd postgresql database *DONE*
 
@@ -27,3 +27,15 @@ Published to the Docker Registry Hub and clone-able by the general public *testi
 ##Image
 
 https://registry.hub.docker.com/u/ninobrooks/dockergate/
+
+#TO-DO
+
+  -Install rest
+
+  -startup script (rest, gatewayd)
+
+  -configure gatewayd to start rest-client
+  
+  -admin app, export ports
+  
+  
