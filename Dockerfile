@@ -31,7 +31,10 @@ RUN service postgresql start
 RUN su - postgres -c "psql -c \"alter user postgres with password '$postgresPW';\""
 # Create postgres user
 RUN su - postgres -c "psql -c \"create user gatewayd_user with password '$gatewayd_userPW';\""
-# Create database and grant user access
+# Create ripple rest user
+RUN su - postgres -c "psql -c \"create user ripplerest_user with password '$rest_userPW';\""
+
+# Create database
 #change postgres template: http://stackoverflow.com/questions/16736891/pgerror-error-new-encoding-utf8-is-incompatible
 script these commands
 >UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';
@@ -41,3 +44,23 @@ script these commands
 >\c template1
 >VACUUM FREEZE;
 RUN su - postgres -c "psql -c \"create database gatewayd_db with owner gatewayd_user encoding='utf8';\""
+#grant users access
+grant all on such and such
+#usd sed to update gatewayd configs
+#
+gateway config/config.js
+'DATABASE_URL': 'postgres://gatewayd_user:password@localhost:5432/gatewayd_db',
+
+lib/data/database
+
+'development': {
+  'ENV': 'postgres://gatewayd_user:password@localhost:5432/gatewayd_db'
+}
+#TODO: update to production when appropriate
+
+#dont forget the bug here
+grunt migrate
+
+start gatewayd, add wallets, currencies (point to our daemon
+
+Documentation for that has moved, perhaps the process has changed. We'll cross that bridge when we get to it.
