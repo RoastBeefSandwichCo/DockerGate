@@ -16,7 +16,8 @@ RUN add-apt-repository -y ppa:chris-lea/node.js && apt-get update && apt-get -y 
 #Download Gatewayd, use known compatible release
 RUN git clone https://github.com/ripple/gatewayd.git
 RUN cd gatewayd/
-RUN git checkout v3.21.0
+RUN git tag -l
+RUN git checkout tags/v3.21.0
 #INSTALL gatewayd dependencies, pm2 separately, save
 RUN npm install --global pg grunt grunt-cli forever db-migrate jshint && npm install --global pm2 --unsafe-perm && npm install --save
 
