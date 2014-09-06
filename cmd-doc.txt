@@ -149,66 +149,66 @@ echo "cd ~/gatewayd" >> ~/start-gatewayd.sh
 echo "bin/gateway start" >> ~/start-gatewayd.sh
 chmod +x ~/start-gatewayd.sh
 sudo cp ~/start-gatewayd.sh /usr/bin && rm ~/start-gatewayd.sh
-
-#M3.2.2?
-#start gatewayd, add wallets, currencies (point to our daemon VET THESE COMMANDS
-bin/gateway add_currency USD
-bin/gateway add_currency BTC
-bin/gateway add_currency LTC
-bin/gateway add_currency DOGE
-bin/gateway add_currency PHC
-bin/gateway set_cold_wallet rLWJBRXJFxd5RCyuFsiXd77bMQdPqe1ohu
-bin/gateway generate_wallet
-sudo service postgresql start
-export DATABASE_URL=postgres://db_user_gatewayd:Lki1AYjhKsEUJfhSAO4-@localhost:5432/gatewayd_db
-bin/gateway set_hot_wallet rDd4uWGejWShq54da56ce4zyn7TWeiGngT snRv5eL1h4m6RkJhAEzwCjk3yxxiN
-
-
-
-#VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-#ISSUES:
-#sed needs better regex for changing existing passwords
-#ESRD flags in postgresql create user not working
-#GATEWAYD HOTFIXES
-#lib/processmanager, line 16 this.processesthingstuff
-#config/config.js, add process.env['DATABASE_URL'] = nconf.get('DATABASE_URL');
-#before exports. see: https://github.com/cornfeedhobo/gatewayd/blob/6f86926f79df2bed7399d626cb0b9966519efa32/config/config.js
-
-
-
-
-#RESET USERS
-#function
-randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
-#gen PWs
-shell_user_gatewaydPW=`randpw 20`
-db_user_postgresPW=`randpw 20`
-db_user_gatewaydPW=`randpw 20`
-db_user_ripple_restPW=`randpw 20`
-#apply changes
-
-#just gatewayd:
-randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
-#gen PWs
-shell_user_gatewaydPW=`randpw 20`
-
-echo "shell_user_gatewayd:$shell_user_gatewaydPW" | chpasswd
-export SHELL_USER_GATEWAYDPW=$shell_user_gatewaydPW
-su shell_user_gatewayd
-cd ~
-cd gatewayd
-echo $SHELL_USER_GATEWAYDPW
-
-
-
-#just postgres
-randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
-#gen PWs
+#
+##M3.2.2?
+##start gatewayd, add wallets, currencies (point to our daemon VET THESE COMMANDS
+#bin/gateway add_currency USD
+#bin/gateway add_currency BTC
+#bin/gateway add_currency LTC
+#bin/gateway add_currency DOGE
+#bin/gateway add_currency PHC
+#bin/gateway set_cold_wallet rLWJBRXJFxd5RCyuFsiXd77bMQdPqe1ohu
+#bin/gateway generate_wallet
+#sudo service postgresql start
+#export DATABASE_URL=postgres://db_user_gatewayd:Lki1AYjhKsEUJfhSAO4-@localhost:5432/gatewayd_db
+#bin/gateway set_hot_wallet rDd4uWGejWShq54da56ce4zyn7TWeiGngT snRv5eL1h4m6RkJhAEzwCjk3yxxiN
+#
+#
+#
+##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+##ISSUES:
+##sed needs better regex for changing existing passwords
+##ESRD flags in postgresql create user not working
+##GATEWAYD HOTFIXES
+##lib/processmanager, line 16 this.processesthingstuff
+##config/config.js, add process.env['DATABASE_URL'] = nconf.get('DATABASE_URL');
+##before exports. see: https://github.com/cornfeedhobo/gatewayd/blob/6f86926f79df2bed7399d626cb0b9966519efa32/config/config.js
+#
+#
+#
+#
+##RESET USERS
+##function
+#randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
+##gen PWs
+#shell_user_gatewaydPW=`randpw 20`
 #db_user_postgresPW=`randpw 20`
 #db_user_gatewaydPW=`randpw 20`
-db_user_ripple_restPW=`randpw 20`
-
-#sudo su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD '$db_user_postgresPW';\""
-#sudo su - postgres -c "psql -c \"ALTER USER db_user_gatewayd WITH PASSWORD '$db_user_gatewaydPW';\""
-sudo su - postgres -c "psql -c \"ALTER USER db_user_ripple_rest WITH PASSWORD '$db_user_ripple_restPW';\""
-#echo "$SHELL_USER_GATEWAYDPW" | sudo -S ddddd
+#db_user_ripple_restPW=`randpw 20`
+##apply changes
+#
+##just gatewayd:
+#randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
+##gen PWs
+#shell_user_gatewaydPW=`randpw 20`
+#
+#echo "shell_user_gatewayd:$shell_user_gatewaydPW" | chpasswd
+#export SHELL_USER_GATEWAYDPW=$shell_user_gatewaydPW
+#su shell_user_gatewayd
+#cd ~
+#cd gatewayd
+#echo $SHELL_USER_GATEWAYDPW
+#
+#
+#
+##just postgres
+#randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
+##gen PWs
+##db_user_postgresPW=`randpw 20`
+##db_user_gatewaydPW=`randpw 20`
+#db_user_ripple_restPW=`randpw 20`
+#
+##sudo su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD '$db_user_postgresPW';\""
+##sudo su - postgres -c "psql -c \"ALTER USER db_user_gatewayd WITH PASSWORD '$db_user_gatewaydPW';\""
+#sudo su - postgres -c "psql -c \"ALTER USER db_user_ripple_rest WITH PASSWORD '$db_user_ripple_restPW';\""
+##echo "$SHELL_USER_GATEWAYDPW" | sudo -S ddddd
