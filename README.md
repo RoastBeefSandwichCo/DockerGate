@@ -18,24 +18,19 @@ Ours is built on ubuntu:14.04. Dockerfile generates passwords and updates config
 
 ~~Configure the gatewayd postgresql database~~ *DONE*
 
-~~Include automatic startup scripts for ripple rest~~ and gatewayd *in progress* 
+~~Include automatic startup scripts for ripple rest~~ and gatewayd *DONE*
 
+Published to the Docker Registry Hub and clone-able by the general public *havin some issues...*
 Start gatewayd with admin webapp and export gateway webapp and http api port *queued*
 
-Published to the Docker Registry Hub and clone-able by the general public *testing*
+
 
 ##Image
 
 https://registry.hub.docker.com/u/ninobrooks/dockergate/
 
 #TO-DO
-
-  -Install rest *verifying*
-
-  -startup script (~~rest~~, gatewayd)
-
-  -configure gatewayd to start rest-client
-  
+  - gatewayd throws error re process manager
   -admin app, export ports
   
   
