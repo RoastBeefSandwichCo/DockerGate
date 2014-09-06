@@ -18,7 +18,7 @@ Ours is built on ubuntu:14.04. Dockerfile generates passwords and updates config
 
 ~~Configure the gatewayd postgresql database~~ *DONE*
 
-~~Include automatic startup scripts for ripple rest~~ and gatewayd *DONE*
+~~Include automatic startup scripts for ripple rest and gatewayd~~ *DONE*
 
 Published to the Docker Registry Hub and clone-able by the general public *havin some issues...*
 Start gatewayd with admin webapp and export gateway webapp and http api port *queued*
