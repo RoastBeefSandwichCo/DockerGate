@@ -16,7 +16,7 @@ A pre-installed, self-configuring Docker image of Gatewayd (Did I say that right
 
 ~~Published to the Docker Registry Hub and clone-able by the general public~~ DONE
 
-Start gatewayd with admin webapp ~~and export gateway webapp and http api port~~ *testing*
+Start ~~gatewayd with~~ admin webapp ~~and expose gateway webapp and http api port~~ *testing*
 
 
 
