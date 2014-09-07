@@ -15,6 +15,7 @@ A pre-installed, self-configuring Docker image of Gatewayd (Did I say that right
 ~~Include automatic startup scripts for ripple rest and gatewayd~~ *DONE*
 
 ~~Published to the Docker Registry Hub and clone-able by the general public~~ DONE
+
 Start gatewayd with admin webapp and export gateway webapp and http api port *testing*
 
 
