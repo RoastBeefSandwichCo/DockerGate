@@ -22,7 +22,8 @@ Start gatewayd with admin webapp and export gateway webapp and http api port *te
 
 ##Image
 
-https://registry.hub.docker.com/u/ninobrooks/dockergate/
+Image: https://registry.hub.docker.com/u/roastbeefsandwichco/dockergate/
+Autobuild: >insert<
 
 ##USAGE
 
