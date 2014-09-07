@@ -43,6 +43,8 @@ sudo apt-get -y install nodejs
 git clone https://github.com/ripple/gatewayd.git
 cd gatewayd/
 #git checkout cd92ad3
+###USE THIS ONE
+git checkout 02eb0fe66c
 #INSTALL gatewayd dependencies, pm2 separately, save
 sudo npm install --global pg grunt grunt-cli forever db-migrate jshint
 
@@ -91,7 +93,8 @@ sudo su - postgres -c "psql -c \"GRANT ALL ON DATABASE ripple_rest_db TO db_user
 #>>>>LOADING FROM THIS MILESTONE REQUIRES PASSWORD RESETS
 ##COPY INIT.D/SSL IN AND CHMOD +X!
 #sudo chmod +x /etc/init.d/ssl *fixed
-service postgresql start
+#if no already started
+sudo service postgresql start
 randpw(){ < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;}
 shell_user_gatewaydPW=`randpw 20`
 echo "shell_user_gatewayd:$shell_user_gatewaydPW" | chpasswd
@@ -146,23 +149,28 @@ sudo cp ~/start-rest.sh /usr/bin && rm ~/start-rest.sh
 #create gatewayd startup script
 echo '#!/bin/sh' > ~/start-gatewayd.sh
 echo "cd ~/gatewayd" >> ~/start-gatewayd.sh
+echo "export DATABASE_URL=postgres://db_user_gatewayd:Lki1AYjhKsEUJfhSAO4-@localhost:5432/gatewayd_db" >> ~/start-gatewayd.sh
 echo "bin/gateway start" >> ~/start-gatewayd.sh
 chmod +x ~/start-gatewayd.sh
 sudo cp ~/start-gatewayd.sh /usr/bin && rm ~/start-gatewayd.sh
 #
 ##M3.2.2?
 ##start gatewayd, add wallets, currencies (point to our daemon VET THESE COMMANDS
-#bin/gateway add_currency USD
-#bin/gateway add_currency BTC
-#bin/gateway add_currency LTC
-#bin/gateway add_currency DOGE
-#bin/gateway add_currency PHC
-#bin/gateway set_cold_wallet rLWJBRXJFxd5RCyuFsiXd77bMQdPqe1ohu
-#bin/gateway generate_wallet
+#If loaded image, postgres and ripple-rest must be running
 #sudo service postgresql start
+
+bin/gateway add_currency USD
+bin/gateway add_currency BTC
+bin/gateway add_currency LTC
+bin/gateway add_currency DOGE
+bin/gateway add_currency PHC
+bin/gateway set_cold_wallet rLWJBRXJFxd5RCyuFsiXd77bMQdPqe1ohu
+bin/gateway generate_wallet
 #export DATABASE_URL=postgres://db_user_gatewayd:Lki1AYjhKsEUJfhSAO4-@localhost:5432/gatewayd_db
-#bin/gateway set_hot_wallet rDd4uWGejWShq54da56ce4zyn7TWeiGngT snRv5eL1h4m6RkJhAEzwCjk3yxxiN
-#
+bin/gateway set_hot_wallet rDd4uWGejWShq54da56ce4zyn7TWeiGngT snRv5eL1h4m6RkJhAEzwCjk3yxxiN
+#address=rL2oWtpE1meX7TdD9XAQnEGvnB6fVZfZKQ, secret=sanBmNNoCY97MePazX8V6mFMVb9xR
+rL2oWtpE1meX7TdD9XAQnEGvnB6fVZfZKQ sanBmNNoCY97MePazX8V6mFMVb9xR
+#NOTE: NEED TO GENERATE THESE DYNAMICALLY
 #
 #
 ##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
@@ -170,7 +178,7 @@ sudo cp ~/start-gatewayd.sh /usr/bin && rm ~/start-gatewayd.sh
 ##sed needs better regex for changing existing passwords
 ##ESRD flags in postgresql create user not working
 ##GATEWAYD HOTFIXES
-##lib/processmanager, line 16 this.processesthingstuff
+##lib/processmanager, line 16 this.processesthingstuff <~~~~~~~~~~~~may have been fixed
 ##config/config.js, add process.env['DATABASE_URL'] = nconf.get('DATABASE_URL');
 ##before exports. see: https://github.com/cornfeedhobo/gatewayd/blob/6f86926f79df2bed7399d626cb0b9966519efa32/config/config.js
 #
