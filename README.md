@@ -27,7 +27,7 @@ Image: https://registry.hub.docker.com/u/roastbeefsandwichco/dockergate/
 Autobuild: https://registry.hub.docker.com/u/roastbeefsandwichco/dockergate-auto/
 
 ##USAGE
-```sudo docker run -p 5900:5900 -p 5000:5000 -i -t roastbeefsandwichco:FULL-dev /bin/bash```
+```sudo docker run -p 5990:5990 -p 5000:5000 -i -t roastbeefsandwichco:FULL-dev /bin/bash```
 
 In order to use the exposed ports outside of the docker image, you must run with ```-p <map-this-port:to-this-port>```
 
