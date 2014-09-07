@@ -24,7 +24,7 @@ Start gatewayd with admin webapp and export gateway webapp and http api port *te
 
 Image: https://registry.hub.docker.com/u/roastbeefsandwichco/dockergate/
 
-Autobuild: >insert<
+Autobuild: https://registry.hub.docker.com/u/roastbeefsandwichco/dockergate-auto/
 
 ##USAGE
 ```sudo docker run -p 5900:5900 -p 5000:5000 -i -t roastbeefsandwichco:FULL-dev /bin/bash```
