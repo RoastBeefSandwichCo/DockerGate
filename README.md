@@ -1,6 +1,6 @@
 DockerGate (scandalous, right?)
 ===============
-A pre-installed, self-configuring Docker image of Gatewayd (Did I say that right?)
+A pre-installed, fully configured Docker image of Gatewayd (Did I say that right?)
 
 
 
@@ -42,3 +42,7 @@ Once you have a shell, use ```passwd shell_user_gatewayd``` to change the defaul
 ```start-gatewayd``` starts... gatewayd
 
 ```start-all``` starts both, in order.
+
+
+##Notes:
+webapp not yet working
