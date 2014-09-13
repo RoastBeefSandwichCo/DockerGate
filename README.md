@@ -1,6 +1,6 @@
 DockerGate (scandalous, right?)
 ===============
-A pre-installed, self-configuring Docker image of Gatewayd (Did I say that right?)
+A pre-installed, fully configured Docker image of Gatewayd (Did I say that right?)
 
 
 
@@ -35,3 +35,14 @@ In order to use the exposed ports outside of the docker image, you must run with
 
 ```-t <tag>``` 
 
+Once you have a shell, use ```passwd shell_user_gatewayd``` to change the default password, then  ```su shell_user_gatewayd```
+
+```start-rest``` starts ripple-rest
+
+```start-gatewayd``` starts... gatewayd
+
+```start-all``` starts both, in order.
+
+
+##Notes:
+webapp not yet working
